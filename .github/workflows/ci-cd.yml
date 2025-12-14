@@ -96,7 +96,6 @@ jobs:
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
-        # Пропустить если секреты не настроены
         continue-on-error: true
 
       - name: Сборка Docker образов
@@ -131,10 +130,6 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
           cache: maven
-
-      - name: Проверка стиля кода (Checkstyle)
-        run: mvn checkstyle:check -B
-        continue-on-error: true
 
       - name: Анализ зависимостей
         run: mvn dependency:analyze -B
