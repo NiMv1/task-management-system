@@ -57,13 +57,13 @@ Write-Host ""
 
 # Сборка сервисов
 Write-Host "[3/5] Сборка сервисов и пересборка Docker образов..." -ForegroundColor Yellow
-mvn -q clean package -pl auth-service,task-service -DskipTests 2>&1 | Out-Null
+mvn -q clean package -pl auth-service,task-service,api-gateway,notification-service -DskipTests 2>&1 | Out-Null
 if ($LASTEXITCODE -ne 0) {
     Write-Host "[ОШИБКА] Не удалось собрать сервисы" -ForegroundColor Red
     Read-Host "Нажмите Enter для выхода"
     exit 1
 }
-docker-compose build --no-cache auth-service task-service 2>&1 | Out-Null
+docker-compose build --no-cache auth-service task-service api-gateway notification-service 2>&1 | Out-Null
 Write-Host "[OK] Образы пересобраны" -ForegroundColor Green
 Write-Host ""
 
