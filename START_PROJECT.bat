@@ -1,6 +1,6 @@
 @echo off
 chcp 65001 >nul
-title Task Management System - Запуск проекта
+title Task Management System
 color 0B
 
 echo ╔══════════════════════════════════════════════════════════════╗
@@ -12,23 +12,23 @@ echo.
 cd /d "%~dp0"
 
 :: Остановка предыдущих Java процессов на портах
-echo [0/8] Остановка предыдущих процессов...
+echo [0/6] Остановка предыдущих процессов...
 for /f "tokens=5" %%a in ('netstat -ano ^| findstr :8080 ^| findstr LISTENING 2^>nul') do taskkill /F /PID %%a 2>nul
 for /f "tokens=5" %%a in ('netstat -ano ^| findstr :8081 ^| findstr LISTENING 2^>nul') do taskkill /F /PID %%a 2>nul
 for /f "tokens=5" %%a in ('netstat -ano ^| findstr :8082 ^| findstr LISTENING 2^>nul') do taskkill /F /PID %%a 2>nul
 echo [OK] Порты освобождены
 echo.
 
-:: Настройка Java 17 (требуется для совместимости с Lombok)
-set JAVA_HOME=C:\Program Files\Eclipse Adoptium\jdk-17.0.17.10-hotspot
-set PATH=%JAVA_HOME%\bin;%PATH%
+:: Настройка Java 17
+set "JAVA_HOME=C:\Program Files\Eclipse Adoptium\jdk-17.0.17.10-hotspot"
+set "PATH=%JAVA_HOME%\bin;%PATH%"
 echo [INFO] Используется Java 17
 
 :: Проверка Java
-echo [1/8] Проверка Java...
+echo [1/6] Проверка Java...
 java -version 2>nul
 if errorlevel 1 (
-    echo [ОШИБКА] Java не найдена! Установите Java 21.
+    echo [ОШИБКА] Java не найдена!
     pause
     exit /b 1
 )
@@ -36,7 +36,7 @@ echo [OK] Java найдена
 echo.
 
 :: Проверка Docker
-echo [2/8] Проверка Docker...
+echo [2/6] Проверка Docker...
 docker info >nul 2>&1
 if errorlevel 1 (
     echo [ОШИБКА] Docker не запущен! Запустите Docker Desktop.
@@ -46,108 +46,71 @@ if errorlevel 1 (
 echo [OK] Docker запущен
 echo.
 
-:: Запуск ВСЕЙ инфраструктуры (включая Prometheus, Grafana, ELK)
-echo [3/8] Запуск всей инфраструктуры Docker...
+:: Запуск инфраструктуры
+echo [3/6] Запуск инфраструктуры Docker...
 docker-compose up -d
 if errorlevel 1 (
     echo [ОШИБКА] Не удалось запустить контейнеры!
     pause
     exit /b 1
 )
-echo [OK] Все контейнеры запущены
+echo [OK] Контейнеры запущены
 echo.
 
-:: Ожидание готовности контейнеров
-echo [4/8] Ожидание готовности сервисов (30 сек)...
-timeout /t 30 /nobreak >nul
+:: Ожидание готовности
+echo [4/6] Ожидание готовности сервисов (25 сек)...
+timeout /t 25 /nobreak >nul
 echo [OK] Сервисы готовы
 echo.
 
 :: Установка Maven модулей
-echo [5/8] Установка Maven модулей...
-call mvn install -N -DskipTests -Dmaven.test.skip=true -q 2>nul
-call mvn install -pl common -DskipTests -Dmaven.test.skip=true -q 2>nul
+echo [5/6] Установка Maven модулей...
+call mvn install -N -DskipTests -q 2>nul
+call mvn install -pl common -DskipTests -q 2>nul
 echo [OK] Модули установлены
 echo.
 
-:: Настройка переменных окружения для сервисов
-set SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5433/auth_db
+:: Настройка переменных окружения
 set SPRING_DATASOURCE_USERNAME=postgres
 set SPRING_DATASOURCE_PASSWORD=postgres
 set SPRING_KAFKA_BOOTSTRAP_SERVERS=localhost:9092
 set SPRING_DATA_REDIS_HOST=localhost
 set SPRING_DATA_REDIS_PORT=6379
 
-echo [6/8] Запуск Auth Service...
-start "Auth Service (8081)" "%~dp0run-auth.bat"
-
-:: Ожидание запуска Auth Service
-timeout /t 25 /nobreak >nul
-
-echo [7/8] Запуск Task Service...
-start "Task Service (8082)" "%~dp0run-task.bat"
-
-:: Ожидание запуска Task Service
-timeout /t 15 /nobreak >nul
-
-:: Открытие браузера с вкладками
-echo [8/8] Открытие браузера...
-timeout /t 5 /nobreak >nul
-start "" "http://localhost:8081/swagger-ui.html"
-timeout /t 1 /nobreak >nul
-start "" "http://localhost:8082/swagger-ui.html"
-timeout /t 1 /nobreak >nul
-start "" "http://localhost:9090"
-timeout /t 1 /nobreak >nul
-start "" "http://localhost:3000"
-timeout /t 1 /nobreak >nul
-start "" "http://localhost:5601"
-echo [OK] Вкладки браузера открыты
+echo [6/6] Запуск сервисов (в этом окне)...
 echo.
-
 echo ╔══════════════════════════════════════════════════════════════╗
-echo ║              TASK MANAGEMENT SYSTEM ЗАПУЩЕН!                ║
+echo ║  Auth Swagger:  http://localhost:8081/swagger-ui.html       ║
+echo ║  Task Swagger:  http://localhost:8082/swagger-ui.html       ║
+echo ║  Prometheus:    http://localhost:9090                       ║
+echo ║  Grafana:       http://localhost:3000 (admin/admin)         ║
 echo ╠══════════════════════════════════════════════════════════════╣
-echo ║  Сервисы:                                                    ║
-echo ║  • API Gateway:     http://localhost:8080                   ║
-echo ║  • Auth Service:    http://localhost:8081                   ║
-echo ║  • Task Service:    http://localhost:8082                   ║
-echo ╠══════════════════════════════════════════════════════════════╣
-echo ║  Swagger UI:                                                 ║
-echo ║  • Auth Swagger:    http://localhost:8081/swagger-ui.html   ║
-echo ║  • Task Swagger:    http://localhost:8082/swagger-ui.html   ║
-echo ╠══════════════════════════════════════════════════════════════╣
-echo ║  Мониторинг:                                                 ║
-echo ║  • Prometheus:      http://localhost:9090                   ║
-echo ║  • Grafana:         http://localhost:3000 (admin/admin)     ║
-echo ║  • Kibana:          http://localhost:5601                   ║
-echo ╠══════════════════════════════════════════════════════════════╣
-echo ║  Health Check:                                               ║
-echo ║  • Auth Health:     http://localhost:8081/actuator/health   ║
-echo ║  • Task Health:     http://localhost:8082/actuator/health   ║
-echo ╠══════════════════════════════════════════════════════════════╣
-echo ║  Для остановки: нажмите любую клавишу в этом окне           ║
+echo ║  Для остановки: закройте это окно или нажмите Ctrl+C        ║
 echo ╚══════════════════════════════════════════════════════════════╝
 echo.
 
-pause
+:: Открытие браузера
+start "" "http://localhost:8081/swagger-ui.html"
 
-:: После остановки - остановить всё
+:: Запуск Auth Service в фоне
+echo Запуск Auth Service на порту 8081...
+set SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5433/auth_db
+start /B "" mvn spring-boot:run -pl auth-service -DskipTests
+
+:: Ожидание запуска Auth Service
+timeout /t 30 /nobreak >nul
+
+:: Запуск Task Service в текущем окне (блокирующий)
+echo Запуск Task Service на порту 8082...
+set SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5434/task_db
+mvn spring-boot:run -pl task-service -DskipTests
+
+:: После остановки (Ctrl+C или закрытие окна) - остановить всё
 echo.
 echo Остановка сервисов...
-:: Остановка Java процессов на портах
-for /f "tokens=5" %%a in ('netstat -ano ^| findstr :8081 ^| findstr LISTENING 2^>nul') do (
-    echo Остановка Auth Service PID: %%a
-    taskkill /F /PID %%a 2>nul
-)
-for /f "tokens=5" %%a in ('netstat -ano ^| findstr :8082 ^| findstr LISTENING 2^>nul') do (
-    echo Остановка Task Service PID: %%a
-    taskkill /F /PID %%a 2>nul
-)
-:: Закрытие окон сервисов
-taskkill /FI "WINDOWTITLE eq Auth Service*" /F 2>nul
-taskkill /FI "WINDOWTITLE eq Task Service*" /F 2>nul
-echo Остановка контейнеров...
+for /f "tokens=5" %%a in ('netstat -ano ^| findstr :8081 ^| findstr LISTENING 2^>nul') do taskkill /F /PID %%a 2>nul
+for /f "tokens=5" %%a in ('netstat -ano ^| findstr :8082 ^| findstr LISTENING 2^>nul') do taskkill /F /PID %%a 2>nul
+echo Остановка контейнеров Docker...
 docker-compose down
 echo.
 echo ╔══════════════════════════════════════════════════════════════╗
