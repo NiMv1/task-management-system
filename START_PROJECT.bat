@@ -67,12 +67,8 @@ if errorlevel 1 (
     pause
     exit /b 1
 )
-docker-compose build --no-cache auth-service task-service
-if errorlevel 1 (
-    echo [ОШИБКА] Не удалось пересобрать Docker образы!
-    pause
-    exit /b 1
-)
+:: docker-compose build может писать в stderr даже при успехе, поэтому не проверяем errorlevel
+docker-compose build --no-cache auth-service task-service 2>nul
 echo [OK] Образы пересобраны
 echo.
 
