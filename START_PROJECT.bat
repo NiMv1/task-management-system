@@ -13,9 +13,20 @@ cd /d "%~dp0"
 
 :: Остановка предыдущих Java процессов на портах
 echo [0/6] Остановка предыдущих процессов...
-for /f "tokens=5" %%a in ('netstat -ano ^| findstr :8080 ^| findstr LISTENING 2^>nul') do taskkill /F /PID %%a 2>nul
-for /f "tokens=5" %%a in ('netstat -ano ^| findstr :8081 ^| findstr LISTENING 2^>nul') do taskkill /F /PID %%a 2>nul
-for /f "tokens=5" %%a in ('netstat -ano ^| findstr :8082 ^| findstr LISTENING 2^>nul') do taskkill /F /PID %%a 2>nul
+for /f "tokens=5" %%a in ('netstat -ano ^| findstr :8080 ^| findstr LISTENING 2^>nul') do (
+    echo Останавливаю процесс на порту 8080, PID: %%a
+    taskkill /F /PID %%a >nul 2>&1
+)
+for /f "tokens=5" %%a in ('netstat -ano ^| findstr :8081 ^| findstr LISTENING 2^>nul') do (
+    echo Останавливаю процесс на порту 8081, PID: %%a
+    taskkill /F /PID %%a >nul 2>&1
+)
+for /f "tokens=5" %%a in ('netstat -ano ^| findstr :8082 ^| findstr LISTENING 2^>nul') do (
+    echo Останавливаю процесс на порту 8082, PID: %%a
+    taskkill /F /PID %%a >nul 2>&1
+)
+:: Ожидание освобождения портов
+timeout /t 3 /nobreak >nul
 echo [OK] Порты освобождены
 echo.
 
