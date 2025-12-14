@@ -15,7 +15,7 @@ echo.
 cd /d "%~dp0"
 
 :: Остановка предыдущих Java процессов на портах
-echo [0/4] Остановка предыдущих процессов...
+echo [0/5] Остановка предыдущих процессов...
 for /f "tokens=5" %%a in ('netstat -ano ^| findstr :8080 ^| findstr LISTENING 2^>nul') do (
     echo Останавливаю процесс на порту 8080, PID: %%a
     taskkill /F /PID %%a >nul 2>&1
@@ -39,7 +39,7 @@ set "PATH=%JAVA_HOME%\bin;%PATH%"
 echo [INFO] Используется Java 17
 
 :: Проверка Java
-echo [1/4] Проверка Java...
+echo [1/5] Проверка Java...
 java -version 2>nul
 if errorlevel 1 (
     echo [ОШИБКА] Java не найдена!
@@ -50,7 +50,7 @@ echo [OK] Java найдена
 echo.
 
 :: Проверка Docker
-echo [2/4] Проверка Docker...
+echo [2/5] Проверка Docker...
 docker info >nul 2>&1
 if errorlevel 1 (
     echo [ОШИБКА] Docker не запущен! Запустите Docker Desktop.
@@ -60,8 +60,24 @@ if errorlevel 1 (
 echo [OK] Docker запущен
 echo.
 
+echo [3/5] Сборка сервисов и пересборка Docker образов...
+call mvn -q clean package -pl auth-service,task-service -DskipTests
+if errorlevel 1 (
+    echo [ОШИБКА] Не удалось собрать сервисы (mvn package)!
+    pause
+    exit /b 1
+)
+docker-compose build --no-cache auth-service task-service
+if errorlevel 1 (
+    echo [ОШИБКА] Не удалось пересобрать Docker образы!
+    pause
+    exit /b 1
+)
+echo [OK] Образы пересобраны
+echo.
+
 :: Запуск инфраструктуры
-echo [3/4] Запуск инфраструктуры Docker...
+echo [4/5] Запуск инфраструктуры Docker...
 docker-compose up -d
 if errorlevel 1 (
     echo [ОШИБКА] Не удалось запустить контейнеры!
@@ -72,7 +88,7 @@ echo [OK] Контейнеры запущены
 echo.
 
 :: Ожидание готовности сервисов
-echo [4/4] Ожидание готовности сервисов (40 сек)...
+echo [5/5] Ожидание готовности сервисов (40 сек)...
 timeout /t 40 /nobreak >nul
 echo [OK] Сервисы запущены
 echo.
