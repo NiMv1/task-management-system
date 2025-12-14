@@ -94,9 +94,16 @@ echo ║  Для остановки: нажмите любую клавишу   
 echo ╚══════════════════════════════════════════════════════════════╝
 echo.
 
-:: Открытие браузера
+:: Открытие браузера - все страницы
 start "" "http://localhost:8081/swagger-ui.html"
+timeout /t 1 /nobreak >nul
 start "" "http://localhost:8082/swagger-ui.html"
+timeout /t 1 /nobreak >nul
+start "" "http://localhost:9090"
+timeout /t 1 /nobreak >nul
+start "" "http://localhost:3000"
+timeout /t 1 /nobreak >nul
+start "" "http://localhost:5601"
 
 :: Ожидание нажатия клавиши для остановки
 pause
