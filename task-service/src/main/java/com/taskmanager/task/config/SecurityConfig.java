@@ -38,6 +38,7 @@ public class SecurityConfig {
                         // Публичные эндпоинты
                         .requestMatchers("/actuator/**").permitAll()
                         .requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**", "/api-docs/**").permitAll()
+                        .requestMatchers("/error").permitAll()
                         // API эндпоинты - в production защищены через API Gateway
                         .requestMatchers("/api/v1/**").permitAll()
                         .anyRequest().authenticated());

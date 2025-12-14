@@ -54,6 +54,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/auth/**").permitAll()
                         .requestMatchers("/actuator/**").permitAll()
                         .requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**", "/api-docs/**").permitAll()
+                        .requestMatchers("/error").permitAll()
                         // Все остальные требуют аутентификации
                         .anyRequest().authenticated())
                 .authenticationProvider(authenticationProvider())
