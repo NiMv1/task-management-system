@@ -30,7 +30,7 @@ public class ProjectController {
     @Operation(summary = "Создание нового проекта")
     public ResponseEntity<ApiResponse<ProjectResponse>> createProject(
             @Valid @RequestBody CreateProjectRequest request,
-            @RequestHeader("X-User-Id") Long userId) {
+            @RequestHeader(value = "X-User-Id", required = false, defaultValue = "1") Long userId) {
         ProjectResponse response = projectService.createProject(request, userId);
         return ResponseEntity
                 .status(HttpStatus.CREATED)

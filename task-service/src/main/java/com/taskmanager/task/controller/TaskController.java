@@ -30,7 +30,7 @@ public class TaskController {
     @Operation(summary = "Создание новой задачи")
     public ResponseEntity<ApiResponse<TaskResponse>> createTask(
             @Valid @RequestBody CreateTaskRequest request,
-            @RequestHeader("X-User-Id") Long userId) {
+            @RequestHeader(value = "X-User-Id", required = false, defaultValue = "1") Long userId) {
         TaskResponse response = taskService.createTask(request, userId);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
