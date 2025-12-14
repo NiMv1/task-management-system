@@ -20,17 +20,9 @@ echo [OK] Порты освобождены
 echo.
 
 :: Настройка Java 17 (требуется для совместимости с Lombok)
-:: Попробуем найти Java 17, если не найдена - используем Java 21
-set JAVA17_PATH=
-for /d %%i in ("C:\Program Files\Eclipse Adoptium\jdk-17*") do set JAVA17_PATH=%%i
-if defined JAVA17_PATH (
-    set JAVA_HOME=%JAVA17_PATH%
-    echo [INFO] Используется Java 17: %JAVA17_PATH%
-) else (
-    set JAVA_HOME=C:\Program Files\Eclipse Adoptium\jdk-21.0.9.10-hotspot
-    echo [WARN] Java 17 не найдена, используется Java 21
-)
+set JAVA_HOME=C:\Program Files\Eclipse Adoptium\jdk-17.0.17.10-hotspot
 set PATH=%JAVA_HOME%\bin;%PATH%
+echo [INFO] Используется Java 17
 
 :: Проверка Java
 echo [1/8] Проверка Java...
