@@ -41,7 +41,7 @@ public class SecurityConfig {
                         // Публичные эндпоинты
                         .requestMatchers("/api/v1/auth/**").permitAll()
                         .requestMatchers("/actuator/**").permitAll()
-                        .requestMatchers("/swagger-ui/**", "/api-docs/**", "/swagger-ui.html").permitAll()
+                        .requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**", "/api-docs/**").permitAll()
                         // Все остальные требуют аутентификации
                         .anyRequest().authenticated())
                 .authenticationProvider(authenticationProvider())
