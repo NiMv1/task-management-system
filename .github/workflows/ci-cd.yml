@@ -107,7 +107,9 @@ jobs:
           docker build -t task-management/api-gateway:latest ./api-gateway
 
       - name: Публикация в Docker Hub
-        if: ${{ secrets.DOCKER_USERNAME != '' }}
+        if: env.DOCKER_USERNAME != ''
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
         run: |
           docker push task-management/auth-service:latest
           docker push task-management/task-service:latest
