@@ -79,13 +79,13 @@ set SPRING_DATA_REDIS_HOST=localhost
 set SPRING_DATA_REDIS_PORT=6379
 
 echo [6/8] Запуск Auth Service...
-start "Auth Service (8081)" cmd /c "cd /d "%~dp0" && set JAVA_HOME=%JAVA_HOME% && set SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5433/auth_db && set SPRING_DATASOURCE_USERNAME=postgres && set SPRING_DATASOURCE_PASSWORD=postgres && mvn spring-boot:run -pl auth-service -DskipTests"
+start "Auth Service (8081)" "%~dp0run-auth.bat"
 
 :: Ожидание запуска Auth Service
-timeout /t 20 /nobreak >nul
+timeout /t 25 /nobreak >nul
 
 echo [7/8] Запуск Task Service...
-start "Task Service (8082)" cmd /c "cd /d "%~dp0" && set JAVA_HOME=%JAVA_HOME% && set SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5434/task_db && set SPRING_DATASOURCE_USERNAME=postgres && set SPRING_DATASOURCE_PASSWORD=postgres && set SPRING_KAFKA_BOOTSTRAP_SERVERS=localhost:9092 && mvn spring-boot:run -pl task-service -DskipTests"
+start "Task Service (8082)" "%~dp0run-task.bat"
 
 :: Ожидание запуска Task Service
 timeout /t 15 /nobreak >nul
