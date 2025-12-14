@@ -135,9 +135,22 @@ pause
 :: После остановки - остановить всё
 echo.
 echo Остановка сервисов...
+:: Остановка Java процессов на портах
+for /f "tokens=5" %%a in ('netstat -ano ^| findstr :8081 ^| findstr LISTENING 2^>nul') do (
+    echo Остановка Auth Service PID: %%a
+    taskkill /F /PID %%a 2>nul
+)
+for /f "tokens=5" %%a in ('netstat -ano ^| findstr :8082 ^| findstr LISTENING 2^>nul') do (
+    echo Остановка Task Service PID: %%a
+    taskkill /F /PID %%a 2>nul
+)
+:: Закрытие окон сервисов
 taskkill /FI "WINDOWTITLE eq Auth Service*" /F 2>nul
 taskkill /FI "WINDOWTITLE eq Task Service*" /F 2>nul
 echo Остановка контейнеров...
 docker-compose down
-echo Готово!
+echo.
+echo ╔══════════════════════════════════════════════════════════════╗
+echo ║                    ВСЕ СЕРВИСЫ ОСТАНОВЛЕНЫ                   ║
+echo ╚══════════════════════════════════════════════════════════════╝
 pause
