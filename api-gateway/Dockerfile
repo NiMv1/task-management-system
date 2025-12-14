@@ -6,8 +6,8 @@ WORKDIR /app
 RUN addgroup -g 1001 -S appgroup && adduser -u 1001 -S appuser -G appgroup
 USER appuser
 
-# Копируем jar файл (собранный локально)
-COPY target/*.jar app.jar
+# Копируем исполняемый jar файл (собранный локально через mvn package)
+COPY target/api-gateway-1.0.0.jar app.jar
 
 # Настройки JVM для контейнера
 ENV JAVA_OPTS="-XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0 -Djava.security.egd=file:/dev/./urandom"
