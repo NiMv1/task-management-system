@@ -46,12 +46,20 @@
 git clone https://github.com/NiMv1/task-management-system.git
 cd task-management-system
 
-# 2. Запустите все сервисы
+# 2. Соберите все модули (требуется Java 21 и Maven)
+mvn clean package -DskipTests
+
+# 3. Запустите все сервисы
 docker-compose up -d
 
-# 3. Проверьте статус (подождите 1-2 минуты для инициализации)
+# 4. Проверьте статус (подождите 1-2 минуты для инициализации)
 docker-compose ps
 ```
+
+> **Примечание**: Если у вас нет Java/Maven, можно запустить только инфраструктуру:
+> ```bash
+> docker-compose up -d auth-db task-db redis zookeeper kafka prometheus grafana
+> ```
 
 ### Доступные сервисы:
 
