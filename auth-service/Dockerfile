@@ -1,5 +1,5 @@
 # Этап запуска (сборка выполняется локально или в CI/CD)
-FROM eclipse-temurin:21-jre-alpine
+FROM eclipse-temurin:17-jre-alpine
 WORKDIR /app
 
 # Создаём пользователя для безопасности

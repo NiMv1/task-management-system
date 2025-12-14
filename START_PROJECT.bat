@@ -19,8 +19,17 @@ for /f "tokens=5" %%a in ('netstat -ano ^| findstr :8082 ^| findstr LISTENING 2^
 echo [OK] Порты освобождены
 echo.
 
-:: Настройка Java
-set JAVA_HOME=C:\Program Files\Eclipse Adoptium\jdk-21.0.9.10-hotspot
+:: Настройка Java 17 (требуется для совместимости с Lombok)
+:: Попробуем найти Java 17, если не найдена - используем Java 21
+set JAVA17_PATH=
+for /d %%i in ("C:\Program Files\Eclipse Adoptium\jdk-17*") do set JAVA17_PATH=%%i
+if defined JAVA17_PATH (
+    set JAVA_HOME=%JAVA17_PATH%
+    echo [INFO] Используется Java 17: %JAVA17_PATH%
+) else (
+    set JAVA_HOME=C:\Program Files\Eclipse Adoptium\jdk-21.0.9.10-hotspot
+    echo [WARN] Java 17 не найдена, используется Java 21
+)
 set PATH=%JAVA_HOME%\bin;%PATH%
 
 :: Проверка Java
@@ -78,13 +87,13 @@ set SPRING_DATA_REDIS_HOST=localhost
 set SPRING_DATA_REDIS_PORT=6379
 
 echo [6/8] Запуск Auth Service...
-start "Auth Service (8081)" cmd /c "cd /d "%~dp0" && set JAVA_HOME=C:\Program Files\Eclipse Adoptium\jdk-21.0.9.10-hotspot && set SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5433/auth_db && set SPRING_DATASOURCE_USERNAME=postgres && set SPRING_DATASOURCE_PASSWORD=postgres && mvn spring-boot:run -pl auth-service -DskipTests"
+start "Auth Service (8081)" cmd /c "cd /d "%~dp0" && set JAVA_HOME=%JAVA_HOME% && set SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5433/auth_db && set SPRING_DATASOURCE_USERNAME=postgres && set SPRING_DATASOURCE_PASSWORD=postgres && mvn spring-boot:run -pl auth-service -DskipTests"
 
 :: Ожидание запуска Auth Service
 timeout /t 20 /nobreak >nul
 
 echo [7/8] Запуск Task Service...
-start "Task Service (8082)" cmd /c "cd /d "%~dp0" && set JAVA_HOME=C:\Program Files\Eclipse Adoptium\jdk-21.0.9.10-hotspot && set SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5434/task_db && set SPRING_DATASOURCE_USERNAME=postgres && set SPRING_DATASOURCE_PASSWORD=postgres && set SPRING_KAFKA_BOOTSTRAP_SERVERS=localhost:9092 && mvn spring-boot:run -pl task-service -DskipTests"
+start "Task Service (8082)" cmd /c "cd /d "%~dp0" && set JAVA_HOME=%JAVA_HOME% && set SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5434/task_db && set SPRING_DATASOURCE_USERNAME=postgres && set SPRING_DATASOURCE_PASSWORD=postgres && set SPRING_KAFKA_BOOTSTRAP_SERVERS=localhost:9092 && mvn spring-boot:run -pl task-service -DskipTests"
 
 :: Ожидание запуска Task Service
 timeout /t 15 /nobreak >nul
