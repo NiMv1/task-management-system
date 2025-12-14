@@ -31,7 +31,7 @@
 
 | Категория | Технологии |
 |-----------|------------|
-| **Backend** | Java 17, Spring Boot 3.2, Spring MVC, Spring Security, Spring Data JPA |
+| **Backend** | Java 21, Spring Boot 3.2, Spring MVC, Spring Security, Spring Data JPA |
 | **Базы данных** | PostgreSQL 15, Redis 7 |
 | **Messaging** | Apache Kafka |
 | **API Gateway** | Spring Cloud Gateway |
@@ -55,7 +55,7 @@
 
 ### Требования
 - Docker & Docker Compose
-- Java 17+
+- Java 21+
 - Maven 3.9+
 
 ### Запуск с Docker Compose
